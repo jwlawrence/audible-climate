@@ -20,10 +20,12 @@ audio.on('error', function(err) {
  * When the 'config' button is pressed, get climate info
  */
 climate.on('ready', function () {
-   	tessel.button.once('press', function() {
-		climate.readTemperature('f', function(err, temp) {
-			climate.readHumidity(function(err, humid) {
-				textToSpeech( 'It is currently ' + (temp - 5).toFixed(0) + ' degrees Fahrenheit, with ' + humid.toFixed(2) + 'percent relative humidity.' );
+	audio.on('ready', function () {
+	   	tessel.button.on('press', function() {
+			climate.readTemperature('f', function(err, temp) {
+				climate.readHumidity(function(err, humid) {
+					textToSpeech( 'It is currently ' + (temp - 5).toFixed(0) + ' degrees Fahrenheit, with ' + humid.toFixed(2) + 'percent relative humidity.' );
+				});
 			});
 		});
 	});
@@ -45,58 +47,41 @@ function textToSpeech(string) {
 	// http.get(url, function(res) {
 	// 	console.log(res);
 
-	// 	res.on('data', function(chunk) {
-	// 		console.log(chunk);
+	// 	// stream audio to headphones
+	// 	speak(res, true);
+	// 	res.pipe(audio.createPlayStream());
 
-	// 		// stream the audio out
-	// 		chunk.pipe(audio.createPlayStream());
-
-	// 		// or write it to a file
-	// 		// var file = fs.createWriteStream('climate.mp3');
-	// 		// chunk.pipe(file);
-	// 	});
+	// 	// stream audio to file
+	// 	var file = fs.createWriteStream('climate.mp3');
+	// 	res.pipe(file);
 
 	// }).on('error', function(err) {
 	// 	console.log("Error: " + err.message);
 	// }).end();
 
-	speakClimate('climate.mp3');
+	speak('climate.mp3', false);
 }
 
 /**
  * Plays audio through the headphone output of the Tessel
  * @param  {String} filename The name of the audio file to be played
  */
-function speakClimate(filename) {
-	audio.on('ready', function () {
+function speak(source, isStream) {
+	audio.setVolume(20, function(err) {
 		if (err) {
 			return console.log(err);
 		}
+		console.log('Volume level set');
 
-		console.log('Preparing to play ' + filename);
+		// Stream audio from file
+		audio.setOutput('headphone', function(err) {
+			console.log('Playing ' + source);
 
-		audio.setVolume(20, function(err) {
-			if (err) {
-				return console.log(err);
+			if ( isStream ) {
+				source.pipe(audio.createPlayStream());
+			} else {
+				fs.createReadStream(source).pipe(audio.createPlayStream());
 			}
-
-			console.log('volume level set');
-
-			// Streaming
-			audio.setOutput('headphone', function(err) {
-				fs.createReadStream(filename).pipe(audio.createPlayStream());
-			});
-
-			// File based
-			// var song = fs.readFileSync(filename);
-			// console.log('Playing ' + filename + '...');
-			// audio.play(song, function(err) {
-			// 	if (err) {
-			// 		console.log(err);
-			// 	} else {
-			// 		console.log('Done playing', filename);
-			// 	}
-			// });
 		});
 	});
 }
