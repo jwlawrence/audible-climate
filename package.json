@@ -1,8 +1,8 @@
 {
-  "name": "audible-weather",
-  "version": "0.0.0",
-  "main": "index.js",
-  "description": "audible-weather",
+  "name": "audible-climate",
+  "version": "0.0.1",
+  "main": "climate.js",
+  "description": "Gathers climate data, converts data to audio and plays through a Tessel audio module",
   "author": {
     "name": "your name here",
     "email": "your email here",
@@ -14,13 +14,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "your git uri here"
+    "url": "https://github.com/Yahosh/audible-climate"
   },
-  "licenses": [
-    {
-      "type": "your license here"
-    }
-  ],
+  "licenses": [{
+    "type": "MIT"
+  }],
   "dependencies": {
     "cylon": "~0.18.0",
     "cylon-gpio": "~0.18.0",
